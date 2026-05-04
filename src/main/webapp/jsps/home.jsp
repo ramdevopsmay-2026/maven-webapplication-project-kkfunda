@@ -46,7 +46,7 @@
 <body>
 
 <header>
-    <h1> Welcome to KK DEVOPS AWS Portal and SRE classes starts from May 3rd 2026 </h1>
+    <h1> Welcome to KK DEVOPS AWS Portal and SRE classes starts from May 3rd 2026 time 10:30AM </h1>
     <h3>Training | Development | Consulting</h3>
 </header>
 
