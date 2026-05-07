@@ -39,7 +39,7 @@ node {
     sh """
         curl -u sai:password \
         --upload-file /var/lib/jenkins/workspace/scriptedpl-ci-cd-test/target/maven-web-application.war \
-        "http://13.206.237.80:8080/manager/text/deploy?path=/maven-web-application&update=true"
+        "http:/13.233.41.182:8080/manager/text/deploy?path=/maven-web-application&update=true"
     """
 }
 
