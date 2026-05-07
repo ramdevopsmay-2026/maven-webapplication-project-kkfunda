@@ -1,0 +1,92 @@
+pipeline{
+agent any
+tools{
+maven "maven-3.9.9"
+}
+
+stages{
+    stage('Job Started Notification') {
+            steps {
+                slackSend(
+                    channel: '#jio-dev',
+                    color: '#FFFF00',
+                    message: "Job Started: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                    )
+            }
+    }
+stage('git checkout'){
+steps
+{
+git branch: 'dev', url: 'https://github.com/ramdevopsmay-2026/maven-webapplication-project-kkfunda.git'
+}
+}// stage ending
+stage('compile'){
+steps{
+    sh "mvn clean compile"
+}
+}// stage ending
+
+stage('build'){
+steps {
+    sh "mvn clean package"
+}
+}
+stage('sonar reporting'){
+steps{
+   sh "mvn sonar:sonar"
+}
+}
+stage('upload artifact to nexus'){
+steps{
+  sh "mvn clean deploy"
+}
+
+}
+stage('Deploy to Tomcat') 
+{
+steps{ 
+ echo "Deploying WAR file using curl..."
+
+    sh """
+        curl -u sai:password \
+        --upload-file /var/lib/jenkins/workspace/scriptedpl-ci-cd-test/target/maven-web-application.war \
+        "http://13.233.41.182:8080/manager/text/deploy?path=/maven-web-application&update=true"
+    """
+	}
+}
+
+}//stages ending 
+post {
+failure{
+ notifyBuild(currentBuild.result)}
+ 
+ success{
+ notifyBuild(currentBuild.result)}
+ }
+}//pipeline ending
+
+def notifyBuild(String buildStatus= 'STARTED'){
+buildStatus=buildStatus?: 'SUCCESS'
+
+//color code default
+def colorName= 'RED'
+def colorCode = '#FF'
+def subject= "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+def summary = "${subject} (${env.BUILD_URL})"
+
+
+
+if (buildStatus == 'STARTED') {
+    
+colorCode = '#FFFF00'  // Yellow
+}
+else if (buildStatus == 'SUCCESS') {
+colorCode = '#00FF00'  // Green
+}
+else{ 
+colorCode = '#FF0000'  // Red
+}
+
+slackSend(color: colorCode, message: summary, channel: '#jio-dev')
+
+}
